@@ -17,20 +17,6 @@ public class TwoFishMasherTest {
     }
 
     @Test
-    public void shouldThrowExceptionDuringEncryptionIfPlainTextIsNotOfTypeByteArray() {
-        TwoFishMasher masher = new TwoFishMasher();
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> masher.encrypt(124, new byte[]{9, 122}));
-        assertEquals("Plain text is not a byte array", exception.getMessage());
-    }
-
-    @Test
-    public void shouldThrowExceptionDuringEncryptionIfPassKeyIsNotOfTypeByteArray() {
-        TwoFishMasher masher = new TwoFishMasher();
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> masher.encrypt(new byte[]{9, 122}, 123));
-        assertEquals("Pass key is not a byte array", exception.getMessage());
-    }
-
-    @Test
     public void shouldThrowExceptionDuringEncryptionIfPassKeyIsNull() {
         TwoFishMasher masher = new TwoFishMasher();
         NullPointerException exception = assertThrows(NullPointerException.class, () -> masher.encrypt(new byte[]{9, 122}, null));
@@ -103,20 +89,6 @@ public class TwoFishMasherTest {
         TwoFishMasher masher = new TwoFishMasher();
         NullPointerException exception = assertThrows(NullPointerException.class, () -> masher.decrypt(null, new byte[]{9, 122}));
         assertEquals("Cipher text is null", exception.getMessage());
-    }
-
-    @Test
-    public void shouldThrowExceptionDuringDecryptionIfCipherTextIsNotOfTypeByteArray() {
-        TwoFishMasher masher = new TwoFishMasher();
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> masher.decrypt(124, new byte[]{9, 122}));
-        assertEquals("Cipher text is not a byte array", exception.getMessage());
-    }
-
-    @Test
-    public void shouldThrowExceptionDuringDecryptionIfPassKeyIsNotOfTypeByteArray() {
-        TwoFishMasher masher = new TwoFishMasher();
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> masher.decrypt(new byte[]{9, 122}, 123));
-        assertEquals("Pass key is not a byte array", exception.getMessage());
     }
 
     @Test

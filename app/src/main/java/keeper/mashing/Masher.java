@@ -1,7 +1,14 @@
 package keeper.mashing;
 
-public interface Masher {
-    Object encrypt(Object plainText, Object passKey);
+import java.io.Serializable;
 
-    Object decrypt(Object cipherText, Object passKey);
+/**
+ * @param <E> Class type of cipher text
+ * @param <D> Class type of plain text
+ * @param <K> Class type of pass key
+ */
+public interface Masher<E extends Serializable, D extends Serializable, K extends Serializable> {
+    E encrypt(D plainText, K passKey);
+
+    D decrypt(E cipherText, K passKey);
 }

@@ -8,39 +8,13 @@ import keeper.mashing.Masher;
 import java.security.InvalidKeyException;
 import java.util.Arrays;
 
-public class TwoFishMasher implements Masher {
+public class TwoFishMasher implements Masher<byte[], byte[], byte[]> {
     private final Twofish twoFish;
     private static final byte PADDING_BYTE = 113;
     private static final int BLOCK_SIZE_IN_BYTES = 16;
 
     public TwoFishMasher() {
         this.twoFish = new Twofish();
-    }
-
-    @Override
-    public Object encrypt(Object plainText, Object passKey) {
-        Preconditions.checkNotNull(plainText, "Plain text is null");
-        Preconditions.checkNotNull(passKey, "Pass key is null");
-        Preconditions.checkArgument(plainText.getClass().getCanonicalName().equals("byte[]"), "Plain text is not a byte array");
-        Preconditions.checkArgument(passKey.getClass().getCanonicalName().equals("byte[]"), "Pass key is not a byte array");
-        try {
-            return encryptObject((byte[]) plainText, (byte[]) passKey);
-        } catch (InvalidKeyException ex) {
-            throw new MasherException("Could not create session key from passkey", ex);
-        }
-    }
-
-    @Override
-    public Object decrypt(Object cipherText, Object passKey) {
-        Preconditions.checkNotNull(cipherText, "Cipher text is null");
-        Preconditions.checkNotNull(passKey, "Pass key is null");
-        Preconditions.checkArgument(cipherText.getClass().getCanonicalName().equals("byte[]"), "Cipher text is not a byte array");
-        Preconditions.checkArgument(passKey.getClass().getCanonicalName().equals("byte[]"), "Pass key is not a byte array");
-        try {
-            return decryptObject((byte[]) cipherText, (byte[]) passKey);
-        } catch (InvalidKeyException ex) {
-            throw new MasherException("Could not create session key from passkey", ex);
-        }
     }
 
     private byte[] decryptObject(byte[] cipherText, byte[] passKey) throws InvalidKeyException {
@@ -82,5 +56,27 @@ public class TwoFishMasher implements Masher {
             cipherText = new byte[0];
         }
         return cipherText;
+    }
+
+    @Override
+    public byte[] encrypt(byte[] plainText, byte[] passKey) {
+        Preconditions.checkNotNull(plainText, "Plain text is null");
+        Preconditions.checkNotNull(passKey, "Pass key is null");
+        try {
+            return encryptObject(plainText, passKey);
+        } catch (InvalidKeyException ex) {
+            throw new MasherException("Could not create session key from passkey", ex);
+        }
+    }
+
+    @Override
+    public byte[] decrypt(byte[] cipherText, byte[] passKey) {
+        Preconditions.checkNotNull(cipherText, "Cipher text is null");
+        Preconditions.checkNotNull(passKey, "Pass key is null");
+        try {
+            return decryptObject(cipherText, passKey);
+        } catch (InvalidKeyException ex) {
+            throw new MasherException("Could not create session key from passkey", ex);
+        }
     }
 }
