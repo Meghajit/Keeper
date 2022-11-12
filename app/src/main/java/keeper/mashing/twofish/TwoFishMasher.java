@@ -1,20 +1,49 @@
-package keeper.mashing;
+package keeper.mashing.twofish;
 
+import com.google.common.base.Preconditions;
 import gnu.crypto.cipher.Twofish;
+import keeper.exception.MasherException;
+import keeper.mashing.Masher;
 
 import java.security.InvalidKeyException;
 import java.util.Arrays;
 
-public class Encryptor {
+public class TwoFishMasher implements Masher {
     private final Twofish twoFish;
     private static final byte PADDING_BYTE = 113;
     private static final int BLOCK_SIZE_IN_BYTES = 16;
 
-    public Encryptor() {
+    public TwoFishMasher() {
         this.twoFish = new Twofish();
     }
 
-    public byte[] decryptObject(byte[] cipherText, byte[] passKey) throws InvalidKeyException {
+    @Override
+    public Object encrypt(Object plainText, Object passKey) {
+        Preconditions.checkNotNull(plainText, "Plain text is null");
+        Preconditions.checkNotNull(passKey, "Pass key is null");
+        Preconditions.checkArgument(plainText.getClass().getCanonicalName().equals("byte[]"), "Plain text is not a byte array");
+        Preconditions.checkArgument(passKey.getClass().getCanonicalName().equals("byte[]"), "Pass key is not a byte array");
+        try {
+            return encryptObject((byte[]) plainText, (byte[]) passKey);
+        } catch (InvalidKeyException ex) {
+            throw new MasherException("Could not create session key from passkey", ex);
+        }
+    }
+
+    @Override
+    public Object decrypt(Object cipherText, Object passKey) {
+        Preconditions.checkNotNull(cipherText, "Cipher text is null");
+        Preconditions.checkNotNull(passKey, "Pass key is null");
+        Preconditions.checkArgument(cipherText.getClass().getCanonicalName().equals("byte[]"), "Cipher text is not a byte array");
+        Preconditions.checkArgument(passKey.getClass().getCanonicalName().equals("byte[]"), "Pass key is not a byte array");
+        try {
+            return decryptObject((byte[]) cipherText, (byte[]) passKey);
+        } catch (InvalidKeyException ex) {
+            throw new MasherException("Could not create session key from passkey", ex);
+        }
+    }
+
+    private byte[] decryptObject(byte[] cipherText, byte[] passKey) throws InvalidKeyException {
         Object sessionKey = twoFish.makeKey(passKey, 16);
         int potentialPaddingStartIndex = cipherText.length - 16;
         int paddingLengthIndicatorIndex = 15; // last byte of the block
@@ -35,7 +64,7 @@ public class Encryptor {
         return plainText;
     }
 
-    public byte[] encryptObject(byte[] input, byte[] passKey) throws InvalidKeyException {
+    private byte[] encryptObject(byte[] input, byte[] passKey) throws InvalidKeyException {
         Object sessionKey = twoFish.makeKey(passKey, 16);
         byte[] cipherText;
         if (input.length % 16 == 0) {
