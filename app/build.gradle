@@ -21,6 +21,7 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
 
     implementation 'org.gnu:gnu-crypto:2.0.1'
+    implementation 'com.google.guava:guava:31.1-jre'
 }
 
 application {
