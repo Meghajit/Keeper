@@ -19,41 +19,33 @@ public class TwoFishMasher implements Masher<byte[], byte[], byte[]> {
 
     private byte[] decryptObject(byte[] cipherText, byte[] passKey) throws InvalidKeyException {
         Object sessionKey = twoFish.makeKey(passKey, 16);
-        int potentialPaddingStartIndex = cipherText.length - 16;
-        int paddingLengthIndicatorIndex = 15; // last byte of the block
-        byte[] paddingBlock = new byte[16];
-        byte[] plainText;
-        twoFish.decrypt(cipherText, potentialPaddingStartIndex, paddingBlock, 0, sessionKey, BLOCK_SIZE_IN_BYTES);
-        if (paddingBlock[paddingLengthIndicatorIndex] == 15) {
-            // then I can ignore the last block as it is fully padding
-            plainText = new byte[cipherText.length - 16];
-            int numberOfInputBlocks = (cipherText.length / 16) - 1;
-            for (int i = 1; i <= numberOfInputBlocks; i++) {
-                int startOffset = (i - 1) * 16;
-                twoFish.decrypt(cipherText, startOffset, plainText, startOffset, sessionKey, BLOCK_SIZE_IN_BYTES);
-            }
-        } else {
-            plainText = new byte[0];
+        byte[] plainText = new byte[cipherText.length];
+        int numberOfInputBlocks = cipherText.length / 16;
+        for (int i = 1; i <= numberOfInputBlocks; i++) {
+            int startOffset = (i - 1) * 16;
+            twoFish.decrypt(cipherText, startOffset, plainText, startOffset, sessionKey, BLOCK_SIZE_IN_BYTES);
         }
-        return plainText;
+        int numberOfPaddingBytesPresent = plainText[plainText.length - 1];
+        int actualDataLength = plainText.length - (numberOfPaddingBytesPresent + 1);
+        return Arrays.copyOfRange(plainText, 0, actualDataLength);
     }
 
     private byte[] encryptObject(byte[] input, byte[] passKey) throws InvalidKeyException {
         Object sessionKey = twoFish.makeKey(passKey, 16);
-        byte[] cipherText;
-        if (input.length % 16 == 0) {
-            cipherText = new byte[input.length + 16];
-            int numberOfInputBlocks = input.length / 16;
-            for (int i = 1; i <= numberOfInputBlocks; i++) {
-                int startOffset = (i - 1) * 16;
-                twoFish.encrypt(input, startOffset, cipherText, startOffset, sessionKey, BLOCK_SIZE_IN_BYTES);
-            }
-            byte[] padding = new byte[16];
-            Arrays.fill(padding, 0, 15, PADDING_BYTE);
-            padding[15] = 15;
-            twoFish.encrypt(padding, 0, cipherText, input.length, sessionKey, BLOCK_SIZE_IN_BYTES);
-        } else {
-            cipherText = new byte[0];
+        int numberOfPaddingBytesRequired = (16 * ((int) Math.floor(input.length / 16)) + 16) - input.length;
+        if (numberOfPaddingBytesRequired == 0) {
+            numberOfPaddingBytesRequired = 16;
+        }
+        int totalLength = input.length + numberOfPaddingBytesRequired;
+        byte[] updatedInputWithPadding = new byte[totalLength];
+        System.arraycopy(input, 0, updatedInputWithPadding, 0, input.length);
+        Arrays.fill(updatedInputWithPadding, input.length, totalLength - 1, PADDING_BYTE);
+        updatedInputWithPadding[totalLength - 1] = (byte) (numberOfPaddingBytesRequired - 1);
+        byte[] cipherText = new byte[totalLength];
+        int numberOfInputBlocks = totalLength / 16;
+        for (int i = 1; i <= numberOfInputBlocks; i++) {
+            int startOffset = (i - 1) * 16;
+            twoFish.encrypt(updatedInputWithPadding, startOffset, cipherText, startOffset, sessionKey, BLOCK_SIZE_IN_BYTES);
         }
         return cipherText;
     }

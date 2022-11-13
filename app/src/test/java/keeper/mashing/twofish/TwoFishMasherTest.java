@@ -39,8 +39,8 @@ public class TwoFishMasherTest {
         byte[] inputPlainText = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
         byte[] passKey = new byte[]{99, 99, 99, 99, 99, 99, 99, 99};
 
-        byte[] cipherText = (byte[]) masher.encrypt(inputPlainText, passKey);
-        byte[] expectedDecryptedValue = (byte[]) masher.decrypt(cipherText, passKey);
+        byte[] cipherText = masher.encrypt(inputPlainText, passKey);
+        byte[] expectedDecryptedValue = masher.decrypt(cipherText, passKey);
 
         assertArrayEquals(inputPlainText, expectedDecryptedValue);
     }
@@ -52,8 +52,8 @@ public class TwoFishMasherTest {
         byte[] passKey = new byte[16];
         Arrays.fill(passKey, (byte) 'x');
 
-        byte[] cipherText = (byte[]) masher.encrypt(inputPlainText, passKey);
-        byte[] expectedDecryptedValue = (byte[]) masher.decrypt(cipherText, passKey);
+        byte[] cipherText = masher.encrypt(inputPlainText, passKey);
+        byte[] expectedDecryptedValue = masher.decrypt(cipherText, passKey);
 
         assertArrayEquals(inputPlainText, expectedDecryptedValue);
     }
@@ -65,8 +65,8 @@ public class TwoFishMasherTest {
         byte[] passKey = new byte[24];
         Arrays.fill(passKey, (byte) 'x');
 
-        byte[] cipherText = (byte[]) masher.encrypt(inputPlainText, passKey);
-        byte[] expectedDecryptedValue = (byte[]) masher.decrypt(cipherText, passKey);
+        byte[] cipherText = masher.encrypt(inputPlainText, passKey);
+        byte[] expectedDecryptedValue = masher.decrypt(cipherText, passKey);
 
         assertArrayEquals(inputPlainText, expectedDecryptedValue);
     }
@@ -78,8 +78,32 @@ public class TwoFishMasherTest {
         byte[] passKey = new byte[32];
         Arrays.fill(passKey, (byte) 'x');
 
-        byte[] cipherText = (byte[]) masher.encrypt(inputPlainText, passKey);
-        byte[] expectedDecryptedValue = (byte[]) masher.decrypt(cipherText, passKey);
+        byte[] cipherText = masher.encrypt(inputPlainText, passKey);
+        byte[] expectedDecryptedValue = masher.decrypt(cipherText, passKey);
+
+        assertArrayEquals(inputPlainText, expectedDecryptedValue);
+    }
+
+    @Test
+    public void shouldSupportEncryptionOfPlainTextLessThanBlockSize() {
+        TwoFishMasher masher = new TwoFishMasher();
+        byte[] inputPlainText = new byte[]{1, 2, 3, 4};
+        byte[] passKey = new byte[]{99, 99, 99, 99, 99, 99, 99, 99};
+
+        byte[] cipherText = masher.encrypt(inputPlainText, passKey);
+        byte[] expectedDecryptedValue = masher.decrypt(cipherText, passKey);
+
+        assertArrayEquals(inputPlainText, expectedDecryptedValue);
+    }
+
+    @Test
+    public void shouldSupportEncryptionOfPlainTextMoreThanBlockSize() {
+        TwoFishMasher masher = new TwoFishMasher();
+        byte[] inputPlainText = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17};
+        byte[] passKey = new byte[]{99, 99, 99, 99, 99, 99, 99, 99};
+
+        byte[] cipherText = masher.encrypt(inputPlainText, passKey);
+        byte[] expectedDecryptedValue = masher.decrypt(cipherText, passKey);
 
         assertArrayEquals(inputPlainText, expectedDecryptedValue);
     }
