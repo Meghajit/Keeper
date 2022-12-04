@@ -27,56 +27,18 @@ public class TwoFishMasherTest {
     public void shouldThrowExceptionDuringEncryptionIfPassKeyIsNotOfCorrectSize() {
         TwoFishMasher masher = new TwoFishMasher();
         byte[] plainText = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
-        byte[] passKey = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9};
+        byte[] passKey = new byte[40];
+        Arrays.fill(passKey, (byte) 'x');
 
         MasherException exception = assertThrows(MasherException.class, () -> masher.encrypt(plainText, passKey));
-        assertEquals("Could not create session key from passkey", exception.getMessage());
+        assertEquals("PassKey should be between 8 and 32 bytes", exception.getMessage());
     }
 
     @Test
-    public void shouldSupportEncryptionWithPassKeyOfSize8Bytes() {
+    public void shouldSupportEncryptionWithPassKeyOfAnySizeBetween8And32Bytes() {
         TwoFishMasher masher = new TwoFishMasher();
         byte[] inputPlainText = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
-        byte[] passKey = new byte[]{99, 99, 99, 99, 99, 99, 99, 99};
-
-        byte[] cipherText = masher.encrypt(inputPlainText, passKey);
-        byte[] expectedDecryptedValue = masher.decrypt(cipherText, passKey);
-
-        assertArrayEquals(inputPlainText, expectedDecryptedValue);
-    }
-
-    @Test
-    public void shouldSupportEncryptionWithPassKeyOfSize16Bytes() {
-        TwoFishMasher masher = new TwoFishMasher();
-        byte[] inputPlainText = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
-        byte[] passKey = new byte[16];
-        Arrays.fill(passKey, (byte) 'x');
-
-        byte[] cipherText = masher.encrypt(inputPlainText, passKey);
-        byte[] expectedDecryptedValue = masher.decrypt(cipherText, passKey);
-
-        assertArrayEquals(inputPlainText, expectedDecryptedValue);
-    }
-
-    @Test
-    public void shouldSupportEncryptionWithPassKeyOfSize24Bytes() {
-        TwoFishMasher masher = new TwoFishMasher();
-        byte[] inputPlainText = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
-        byte[] passKey = new byte[24];
-        Arrays.fill(passKey, (byte) 'x');
-
-        byte[] cipherText = masher.encrypt(inputPlainText, passKey);
-        byte[] expectedDecryptedValue = masher.decrypt(cipherText, passKey);
-
-        assertArrayEquals(inputPlainText, expectedDecryptedValue);
-    }
-
-    @Test
-    public void shouldSupportEncryptionWithPassKeyOfSize32Bytes() {
-        TwoFishMasher masher = new TwoFishMasher();
-        byte[] inputPlainText = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
-        byte[] passKey = new byte[32];
-        Arrays.fill(passKey, (byte) 'x');
+        byte[] passKey = new byte[]{99, 99, 99, 99, 99, 99, 99, 99, 99, 121, 11, 13};
 
         byte[] cipherText = masher.encrypt(inputPlainText, passKey);
         byte[] expectedDecryptedValue = masher.decrypt(cipherText, passKey);
@@ -126,9 +88,9 @@ public class TwoFishMasherTest {
     public void shouldThrowExceptionDuringDecryptionIfPassKeyIsNotOfCorrectSize() {
         TwoFishMasher masher = new TwoFishMasher();
         byte[] plainText = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
-        byte[] passKey = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9};
+        byte[] passKey = new byte[]{1, 2, 3, 4, 5, 6};
 
         MasherException exception = assertThrows(MasherException.class, () -> masher.decrypt(plainText, passKey));
-        assertEquals("Could not create session key from passkey", exception.getMessage());
+        assertEquals("PassKey should be between 8 and 32 bytes", exception.getMessage());
     }
 }

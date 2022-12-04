@@ -17,8 +17,9 @@ public class TwoFishMasher implements Masher<byte[], byte[], byte[]> {
         this.twoFish = new Twofish();
     }
 
-    private byte[] decryptObject(byte[] cipherText, byte[] passKey) throws InvalidKeyException {
-        Object sessionKey = twoFish.makeKey(passKey, 16);
+    private byte[] decryptObject(byte[] cipherText, byte[] inputPassKey) throws InvalidKeyException {
+        byte[] paddedPassKey = addPassKeyPadding(inputPassKey);
+        Object sessionKey = twoFish.makeKey(paddedPassKey, 16);
         byte[] plainText = new byte[cipherText.length];
         int numberOfInputBlocks = cipherText.length / 16;
         for (int i = 1; i <= numberOfInputBlocks; i++) {
@@ -30,8 +31,9 @@ public class TwoFishMasher implements Masher<byte[], byte[], byte[]> {
         return Arrays.copyOfRange(plainText, 0, actualDataLength);
     }
 
-    private byte[] encryptObject(byte[] input, byte[] passKey) throws InvalidKeyException {
-        Object sessionKey = twoFish.makeKey(passKey, 16);
+    private byte[] encryptObject(byte[] input, byte[] inputPassKey) throws InvalidKeyException {
+        byte[] paddedPassKey = addPassKeyPadding(inputPassKey);
+        Object sessionKey = twoFish.makeKey(paddedPassKey, 16);
         int numberOfPaddingBytesRequired = (16 * ((int) Math.floor(input.length / 16)) + 16) - input.length;
         if (numberOfPaddingBytesRequired == 0) {
             numberOfPaddingBytesRequired = 16;
@@ -48,6 +50,19 @@ public class TwoFishMasher implements Masher<byte[], byte[], byte[]> {
             twoFish.encrypt(updatedInputWithPadding, startOffset, cipherText, startOffset, sessionKey, BLOCK_SIZE_IN_BYTES);
         }
         return cipherText;
+    }
+
+    private byte[] addPassKeyPadding(byte[] passKey) {
+        if (passKey.length < 8 || passKey.length > 32) {
+            throw new MasherException("PassKey should be between 8 and 32 bytes");
+        } else {
+            byte[] paddedPassKey = new byte[32];
+            System.arraycopy(passKey, 0, paddedPassKey, 0, passKey.length);
+            for (int i = passKey.length; i < 32; i++) {
+                paddedPassKey[i] = PADDING_BYTE;
+            }
+            return paddedPassKey;
+        }
     }
 
     @Override
