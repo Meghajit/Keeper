@@ -2,11 +2,11 @@ package keeper.entity;
 
 import java.io.Serializable;
 
-public class Account<T extends Serializable> {
+public class Account implements Serializable {
     private final String customerUUID;
-    private final T encryptedPassKey;
+    private final byte[] encryptedPassKey;
 
-    public Account(String customerUUID, T encryptedPassKey) {
+    public Account(String customerUUID, byte[] encryptedPassKey) {
         this.customerUUID = customerUUID;
         this.encryptedPassKey = encryptedPassKey;
     }
@@ -15,7 +15,7 @@ public class Account<T extends Serializable> {
         return customerUUID;
     }
 
-    public T getEncryptedPassKey() {
+    public byte[] getEncryptedPassKey() {
         return encryptedPassKey;
     }
 }

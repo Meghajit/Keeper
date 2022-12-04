@@ -1,6 +1,8 @@
 package keeper.entity;
 
-public class Customer {
+import java.io.Serializable;
+
+public class Customer implements Serializable {
     private final String uuid;
     private final String firstName;
     private final String lastName;

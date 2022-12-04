@@ -2,7 +2,7 @@ package keeper.entity;
 
 import java.io.Serializable;
 
-public class EncryptedSecret<T extends Serializable> {
+public class EncryptedSecret<T> implements Serializable {
     private final String name;
     private final String customerUUID;
     private final T cipherText;
