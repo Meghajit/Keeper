@@ -23,6 +23,7 @@ dependencies {
     implementation 'org.gnu:gnu-crypto:2.0.1'
     implementation 'com.google.guava:guava:31.1-jre'
     implementation 'org.apache.commons:commons-lang3:3.12.0'
+    implementation 'org.xerial:sqlite-jdbc:3.40.0.0'
 }
 
 application {
