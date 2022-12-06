@@ -10,13 +10,12 @@ public class AccountRepository {
 
     public AccountRepository() {
         try {
-            String dbPath = "src/main/resources/keeper.db";
+            String dbPath = "app/src/main/resources/keeper.db";
             connection = DriverManager.getConnection("jdbc:sqlite:" + dbPath);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
         System.out.println("AccountRepository DB connection established");
-
     }
 
     public Account createAccount(String customerUUID, byte[] passKey) {
