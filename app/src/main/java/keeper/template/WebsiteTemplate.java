@@ -2,17 +2,12 @@ package keeper.template;
 
 import java.nio.charset.StandardCharsets;
 
-public class WebsiteSecret implements Template {
+public class WebsiteTemplate implements Template {
     private final byte[] username;
     private final byte[] password;
-
-    public byte[] getMetadata() {
-        return metadata;
-    }
-
     private final byte[] metadata;
 
-    public WebsiteSecret(byte[] username, byte[] password, byte[] metadata) {
+    public WebsiteTemplate(byte[] username, byte[] password, byte[] metadata) {
         this.username = username;
         this.password = password;
         this.metadata = metadata;
