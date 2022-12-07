@@ -1,6 +1,7 @@
 package keeper.entity;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 public class Account implements Serializable {
     private final String customerUUID;
@@ -17,5 +18,13 @@ public class Account implements Serializable {
 
     public byte[] getEncryptedPassKey() {
         return encryptedPassKey;
+    }
+
+    @Override
+    public String toString() {
+        return "Account{" +
+                "customerUUID='" + customerUUID + '\'' +
+                ", encryptedPassKey=" + Arrays.toString(encryptedPassKey) +
+                '}';
     }
 }
