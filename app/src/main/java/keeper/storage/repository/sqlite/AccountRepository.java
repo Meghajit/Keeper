@@ -35,11 +35,11 @@ public class AccountRepository {
                 statement.setString(1, customerUUID);
                 statement.setString(2, base64EncodedEncryptedPassKey);
                 int recordsUpdated = statement.executeUpdate();
+                statement.close();
                 if (recordsUpdated == 0) {
                     System.out.println("Account could not be created.");
                     return null;
                 }
-                statement.close();
                 System.out.println("Account successfully created.");
                 return findAccount(customerUUID);
             } catch (SQLException e) {
@@ -85,12 +85,12 @@ public class AccountRepository {
                 statement.setString(2, customerUUID);
                 int recordsUpdated = statement.executeUpdate();
                 statement.close();
-                if (recordsUpdated == 0) {
-                    System.out.println("Account could not be updated.");
-                    return false;
-                } else {
+                if (recordsUpdated == 1) {
                     System.out.println("Account successfully updated.");
                     return true;
+                } else {
+                    System.out.println("Account could not be updated.");
+                    return false;
                 }
             } catch (SQLException e) {
                 throw new RuntimeException(e);
