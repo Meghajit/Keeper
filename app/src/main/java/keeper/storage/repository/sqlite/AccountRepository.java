@@ -18,6 +18,7 @@ public class AccountRepository {
                     " ENCRYPTED_PASSKEY BLOB NOT NULL, " +
                     " PRIMARY KEY (CUSTOMER_UUID, ENCRYPTED_PASSKEY))";
             statement.executeUpdate(sql);
+            System.out.println("Account table successfully initialized.");
             statement.close();
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -35,18 +36,77 @@ public class AccountRepository {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+        System.out.println("Account successfully created.");
         return new Account(customerUUID, passKey);
     }
 
     public Account findAccount(String customerUUID, byte[] passKey) {
-        return null;
+        try {
+            String sql = "SELECT * FROM ACCOUNT WHERE CUSTOMER_UUID = ? AND ENCRYPTED_PASSKEY = ?";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, customerUUID);
+            statement.setBytes(2, passKey);
+            ResultSet resultSet = statement.executeQuery();
+            Account account;
+
+            if (resultSet.next()) {
+                account = new Account(resultSet.getString("CUSTOMER_UUID"), resultSet.getBytes("ENCRYPTED_PASSKEY"));
+                if (resultSet.next()) {
+                    throw new RuntimeException("Multiple accounts found with the same credentials !");
+                }
+            } else {
+                account = null;
+            }
+            resultSet.close();
+            statement.close();
+            return account;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public void updateAccount(String customerUUID, byte[] oldPassKey, byte[] newPassKey) {
+    public boolean updateAccount(String customerUUID, byte[] oldPassKey, byte[] newPassKey) {
+        if (findAccount(customerUUID, oldPassKey) != null) {
+            try {
+                String sql = "UPDATE ACCOUNT SET ENCRYPTED_PASSKEY = ? WHERE CUSTOMER_UUID = ? AND ENCRYPTED_PASSKEY = ?";
+                PreparedStatement statement = connection.prepareStatement(sql);
+                statement.setBytes(1, newPassKey);
+                statement.setString(2, customerUUID);
+                statement.setBytes(3, oldPassKey);
+                int recordsUpdated = statement.executeUpdate();
+                if (recordsUpdated == 0) {
+                    return false;
+                } else {
+                    System.out.println("Account successfully updated.");
+                    return true;
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
 
+        }
+        return false;
     }
 
-    public void deleteAccount(String customerUUID, byte[] passKey) {
-
+    public boolean deleteAccount(String customerUUID, byte[] passKey) {
+        if (findAccount(customerUUID, passKey) != null) {
+            try {
+                String sql = "DELETE FROM ACCOUNT WHERE CUSTOMER_UUID = ? AND ENCRYPTED_PASSKEY = ?";
+                PreparedStatement statement = connection.prepareStatement(sql);
+                statement.setString(1, customerUUID);
+                statement.setBytes(2, passKey);
+                int recordsDeleted = statement.executeUpdate();
+                if (recordsDeleted == 0) {
+                    return false;
+                } else {
+                    System.out.println("Account successfully deleted.");
+                    return true;
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            return false;
+        }
     }
 }

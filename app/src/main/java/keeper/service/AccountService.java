@@ -34,20 +34,20 @@ public class AccountService {
         return accountRepository.findAccount(customerUUID, selfEncryptedPassKey);
     }
 
-    public void updateAccount(String customerUUID, String oldUtf8PassKey, String newUtf8PassKey) {
+    public boolean updateAccount(String customerUUID, String oldUtf8PassKey, String newUtf8PassKey) {
         byte[] oldPassKeyBytes = oldUtf8PassKey.getBytes(StandardCharsets.UTF_8);
         byte[] newPassKeyBytes = newUtf8PassKey.getBytes(StandardCharsets.UTF_8);
         validatePassKeyLength(oldPassKeyBytes.length);
         validatePassKeyLength(newPassKeyBytes.length);
         byte[] selfEncryptedOldPassKey = encryptionService.encrypt(oldPassKeyBytes, oldPassKeyBytes);
         byte[] selfEncryptedNewPassKey = encryptionService.encrypt(newPassKeyBytes, newPassKeyBytes);
-        accountRepository.updateAccount(customerUUID, selfEncryptedOldPassKey, selfEncryptedNewPassKey);
+        return accountRepository.updateAccount(customerUUID, selfEncryptedOldPassKey, selfEncryptedNewPassKey);
     }
 
-    public void deleteAccount(String customerUUID, String utf8PassKey) {
+    public boolean deleteAccount(String customerUUID, String utf8PassKey) {
         byte[] passKeyBytes = utf8PassKey.getBytes(StandardCharsets.UTF_8);
         validatePassKeyLength(passKeyBytes.length);
         byte[] selfEncryptedPassKey = encryptionService.encrypt(passKeyBytes, passKeyBytes);
-        accountRepository.deleteAccount(customerUUID, selfEncryptedPassKey);
+        return accountRepository.deleteAccount(customerUUID, selfEncryptedPassKey);
     }
 }
